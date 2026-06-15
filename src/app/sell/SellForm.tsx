@@ -195,7 +195,8 @@ export function SellForm() {
           fileSize: fileSize || null,
         }),
       });
-      if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Submission failed"); }
+      const postData = await res.json();
+      if (!res.ok) throw new Error(postData.error || "Submission failed");
       setSubmitted(true);
     } catch (err: any) {
       setError(err.message);
