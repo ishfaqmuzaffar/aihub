@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  bio           String?
+  website       String?
+  username      String?   @unique
+  badge         String?
+  isAdmin       Boolean   @default(false)
+  totalSales    Int       @default(0)
+  totalEarnings Float     @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  posts     Post[]
+  likes     Like[]
+  bookmarks Bookmark[]
+  followers Follow[]   @relation("following")
+  following Follow[]   @relation("follower")
+  comments  Comment[]
+  purchases Purchase[] @relation("buyer")
+  cartItems CartItem[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Post {
+  id              String        @id @default(cuid())
+  title           String
+  description     String?       @db.Text
+  type            PostType
+  content         String?       @db.Text
+  imageUrl        String?
+  images          String[]
+  tags            String[]
+  status          PostStatus    @default(PENDING)
+  adminNote       String?
+  published       Boolean       @default(false)
+  viewCount       Int           @default(0)
+  salesCount      Int           @default(0)
+  price           Float?
+  isFree          Boolean       @default(false)
+  rating          Float         @default(0)
+  ratingCount     Int           @default(0)
+  featured        Boolean       @default(false)
+
+  // Tool-specific metadata
+  version         String?
+  compatibility   String[]
+  demoUrl         String?
+  documentationUrl String?
+  supportEmail    String?
+  toolsUsed       String[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  authorId        String
+  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes           Like[]
+  bookmarks       Bookmark[]
+  comments        Comment[]
+  purchases       Purchase[]
+  cartItems       CartItem[]
+  remixedFrom     Post?         @relation("Remixes", fields: [remixedFromId], references: [id])
+  remixedFromId   String?
+  remixes         Post[]        @relation("Remixes")
+}
+
+enum PostType {
+  APP
+  WORKFLOW
+  AGENT
+  TEMPLATE
+  PLUGIN
+  DATASET
+}
+
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@unique([userId, postId])
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  price     Float
+  createdAt DateTime @default(now())
+  user      User     @relation("buyer", fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@unique([userId, postId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@unique([userId, postId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@unique([userId, postId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  @@unique([followerId, followingId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  rating    Int?
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
