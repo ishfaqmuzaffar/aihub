@@ -63,7 +63,7 @@ export function Navbar() {
                   </span>
                 )}
               </Link>
-              <Link href="/upload" className="flex items-center gap-1.5 text-sm px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
+              <Link href="/sell" className="flex items-center gap-1.5 text-sm px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
                 <Upload className="w-3.5 h-3.5" />
                 Sell
               </Link>

@@ -69,46 +69,53 @@ model VerificationToken {
 }
 
 model Post {
-  id              String        @id @default(cuid())
-  title           String
-  description     String?       @db.Text
-  type            PostType
-  content         String?       @db.Text
-  imageUrl        String?
-  images          String[]
-  tags            String[]
-  status          PostStatus    @default(PENDING)
-  adminNote       String?
-  published       Boolean       @default(false)
-  viewCount       Int           @default(0)
-  salesCount      Int           @default(0)
-  price           Float?
-  isFree          Boolean       @default(false)
-  rating          Float         @default(0)
-  ratingCount     Int           @default(0)
-  featured        Boolean       @default(false)
+  id               String     @id @default(cuid())
+  title            String
+  description      String?    @db.Text
+  type             PostType
+  content          String?    @db.Text
+  imageUrl         String?
+  images           String[]
+  tags             String[]
+  status           PostStatus @default(PENDING)
+  adminNote        String?
+  published        Boolean    @default(false)
+  viewCount        Int        @default(0)
+  salesCount       Int        @default(0)
+  price            Float?
+  isFree           Boolean    @default(false)
+  rating           Float      @default(0)
+  ratingCount      Int        @default(0)
+  featured         Boolean    @default(false)
 
-  // Tool-specific metadata
-  version         String?
-  compatibility   String[]
-  demoUrl         String?
+  // Delivery
+  fileUrl          String?
+  fileName         String?
+  fileSize         Int?
+
+  // Tool metadata
+  version          String?
+  compatibility    String[]
+  demoUrl          String?
+  videoUrl         String?
   documentationUrl String?
-  supportEmail    String?
-  toolsUsed       String[]
+  supportEmail     String?
+  toolsUsed        String[]
+  requirements     String?    @db.Text
 
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
-  authorId        String
-  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  likes           Like[]
-  bookmarks       Bookmark[]
-  comments        Comment[]
-  purchases       Purchase[]
-  cartItems       CartItem[]
-  remixedFrom     Post?         @relation("Remixes", fields: [remixedFromId], references: [id])
-  remixedFromId   String?
-  remixes         Post[]        @relation("Remixes")
+  authorId         String
+  author           User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes            Like[]
+  bookmarks        Bookmark[]
+  comments         Comment[]
+  purchases        Purchase[]
+  cartItems        CartItem[]
+  remixedFrom      Post?      @relation("Remixes", fields: [remixedFromId], references: [id])
+  remixedFromId    String?
+  remixes          Post[]     @relation("Remixes")
 }
 
 enum PostType {

@@ -36,9 +36,14 @@ export type PostWithAuthor = {
   version: string | null;
   compatibility: string[];
   demoUrl: string | null;
+  videoUrl: string | null;
   documentationUrl: string | null;
   supportEmail: string | null;
   toolsUsed: string[];
+  requirements: string | null;
+  fileUrl: string | null;
+  fileName: string | null;
+  fileSize: number | null;
   createdAt: Date;
   updatedAt: Date;
   authorId: string;

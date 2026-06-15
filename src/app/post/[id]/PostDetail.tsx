@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Bookmark, MessageCircle, Eye, Share2, ArrowLeft, ShoppingCart, Download, CheckCircle, Star, GitFork } from "lucide-react";
+import { Heart, Bookmark, MessageCircle, Eye, Share2, ArrowLeft, ShoppingCart, Download, CheckCircle, Star, GitFork, ExternalLink } from "lucide-react";
 import { cn, formatCount, timeAgo, POST_TYPE_CONFIG, getAvatarColor, formatPrice } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
 import { useSession } from "next-auth/react";
@@ -206,9 +206,23 @@ export function PostDetail({ post, session: serverSession }: { post: any; sessio
                 <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-700 font-medium">
                   <CheckCircle className="w-4 h-4" /> You own this item
                 </div>
-                <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors">
-                  <Download className="w-4 h-4" /> Download / Access
-                </button>
+                {post.fileUrl ? (
+                  <a href={`/api/posts/${post.id}/download`}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                  >
+                    <Download className="w-4 h-4" /> Download file
+                  </a>
+                ) : post.demoUrl ? (
+                  <a href={post.demoUrl} target="_blank" rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" /> Access tool
+                  </a>
+                ) : (
+                  <div className="w-full text-center py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm">
+                    Check your email for access details
+                  </div>
+                )}
               </div>
             ) : post.isFree ? (
               <button className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors text-base">
@@ -278,7 +292,33 @@ export function PostDetail({ post, session: serverSession }: { post: any; sessio
             ))}
           </div>
 
-          {/* Tags */}
+          {(post.demoUrl || post.videoUrl || post.documentationUrl) && (
+            <div className="space-y-2">
+              {post.demoUrl && (
+                <a href={post.demoUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="w-4 h-4" /> Live demo
+                </a>
+              )}
+              {post.videoUrl && (
+                <a href={post.videoUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="w-4 h-4" /> Video walkthrough
+                </a>
+              )}
+              {post.documentationUrl && (
+                <a href={post.documentationUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="w-4 h-4" /> Documentation
+                </a>
+              )}
+            </div>
+          )}
+
+
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {post.tags.map((tag: string) => (
